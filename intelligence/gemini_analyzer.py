@@ -1,8 +1,9 @@
 """
 Gemini AI Analyzer for Quantra-950
-Advanced market intelligence using Google Gemini 2.5 Flash
+Advanced market intelligence using Google Gemini 2.5 Flash Lite
 """
 import google.generativeai as genai
+from google.api_core.exceptions import ResourceExhausted
 from config.settings import settings
 import json
 from typing import Dict, Optional, List
@@ -11,8 +12,9 @@ from datetime import datetime
 
 class GeminiAnalyzer:
     """
-    AI-powered market analyzer using Gemini 2.5 Flash
+    AI-powered market analyzer using Gemini 2.5 Flash Lite
     Implements evolutionary learning and multi-timeframe analysis
+    Free tier: 1,500 requests/day, 30 requests/minute
     """
 
     # QUANTRA-950 System Prompt - Autonomous Trading Intelligence
@@ -163,9 +165,9 @@ Remember: Your goal is not to always have a signal, but to identify the BEST opp
         # Configure Gemini
         genai.configure(api_key=self.api_key)
 
-        # Use Gemini 2.5 Flash for speed and efficiency
+        # Use Gemini 2.5 Flash Lite for free tier (1,500 req/day)
         self.model = genai.GenerativeModel(
-            model_name='models/gemini-2.5-flash',
+            model_name='gemini-2.5-flash-lite',
             generation_config={
                 'temperature': 0.3,  # Lower temperature for more consistent analysis
                 'top_p': 0.95,
@@ -174,7 +176,8 @@ Remember: Your goal is not to always have a signal, but to identify the BEST opp
             }
         )
 
-        print(f"✓ Gemini AI analyzer initialized (Model: models/gemini-2.5-flash)")
+        print(f"✓ Gemini AI analyzer initialized (Model: gemini-2.5-flash-lite)")
+        print(f"✓ Free tier quota: 1,500 requests/day, 30 requests/minute")
 
     def _format_market_data(self, market_data: Dict) -> str:
         """
@@ -275,7 +278,7 @@ Respond with ONLY valid JSON (no markdown formatting, no code blocks, no explana
             prompt = self._format_market_data(market_data)
 
             # Generate analysis using Gemini
-            print("\n🤖 Generating AI analysis with Gemini 2.0 Flash...")
+            print("\n🤖 Generating AI analysis with Gemini 2.5 Flash Lite...")
             response = self.model.generate_content(
                 [self.SYSTEM_PROMPT, prompt]
             )
@@ -305,7 +308,7 @@ Respond with ONLY valid JSON (no markdown formatting, no code blocks, no explana
 
             # Add metadata
             analysis['_metadata'] = {
-                'model': 'models/gemini-2.5-flash',
+                'model': 'gemini-2.5-flash-lite',
                 'analyzed_at': datetime.now().isoformat(),
                 'prompt_tokens': len(prompt.split()),
                 'symbol': market_data.get('symbol', 'BTCUSDT')
@@ -313,6 +316,13 @@ Respond with ONLY valid JSON (no markdown formatting, no code blocks, no explana
 
             print(f"✓ AI analysis complete")
             return analysis
+
+        except ResourceExhausted as e:
+            print(f"\n⚠️  Rate limit exceeded for Gemini API")
+            print(f"   Free tier quota: 1,500 requests/day, 30 requests/minute")
+            print(f"   Error: {e}")
+            print(f"   Please wait a few minutes and try again.")
+            raise ValueError("Gemini API rate limit exceeded. Please wait and retry.") from e
 
         except json.JSONDecodeError as e:
             print(f"✗ Failed to parse Gemini response as JSON: {e}")
