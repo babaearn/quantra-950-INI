@@ -353,18 +353,38 @@ Respond with ONLY valid JSON (no markdown formatting, no code blocks, no explana
         print(f"📊 CONFIDENCE: {confidence}/100")
 
         # Entry and risk management
-        print(f"\n💰 ENTRY PRICE: ${analysis['entry_price']:,.2f}")
-        print(f"🛑 STOP LOSS: ${analysis['stop_loss']:,.2f}")
+        if analysis.get('entry_price') is not None:
+            print(f"\n💰 ENTRY PRICE: ${analysis['entry_price']:,.2f}")
+        else:
+            print(f"\n💰 ENTRY PRICE: N/A (No trade signal)")
 
-        if 'targets' in analysis:
+        if analysis.get('stop_loss') is not None:
+            print(f"🛑 STOP LOSS: ${analysis['stop_loss']:,.2f}")
+        else:
+            print(f"🛑 STOP LOSS: N/A (No trade signal)")
+
+        if 'targets' in analysis and analysis['targets'] is not None:
             targets = analysis['targets']
             print(f"🎯 TARGETS:")
-            print(f"   TP1: ${targets.get('tp1', 0):,.2f}")
-            print(f"   TP2: ${targets.get('tp2', 0):,.2f}")
-            print(f"   TP3: ${targets.get('tp3', 0):,.2f}")
+            if targets.get('tp1') is not None:
+                print(f"   TP1: ${targets.get('tp1'):,.2f}")
+            else:
+                print(f"   TP1: N/A")
+            if targets.get('tp2') is not None:
+                print(f"   TP2: ${targets.get('tp2'):,.2f}")
+            else:
+                print(f"   TP2: N/A")
+            if targets.get('tp3') is not None:
+                print(f"   TP3: ${targets.get('tp3'):,.2f}")
+            else:
+                print(f"   TP3: N/A")
+        else:
+            print(f"🎯 TARGETS: N/A (No trade signal)")
 
-        if 'risk_reward_ratio' in analysis:
+        if 'risk_reward_ratio' in analysis and analysis['risk_reward_ratio'] is not None:
             print(f"📈 RISK/REWARD: 1:{analysis['risk_reward_ratio']:.2f}")
+        else:
+            print(f"📈 RISK/REWARD: N/A (No trade signal)")
 
         # Timeframe alignment
         if 'timeframe_alignment' in analysis:
