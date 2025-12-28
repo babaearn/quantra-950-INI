@@ -165,7 +165,7 @@ Remember: Your goal is not to always have a signal, but to identify the BEST opp
 
         # Use Gemini 2.5 Flash for speed and efficiency
         self.model = genai.GenerativeModel(
-            model_name='gemini-2.0-flash-exp',
+            model_name='models/gemini-2.5-flash',
             generation_config={
                 'temperature': 0.3,  # Lower temperature for more consistent analysis
                 'top_p': 0.95,
@@ -174,7 +174,7 @@ Remember: Your goal is not to always have a signal, but to identify the BEST opp
             }
         )
 
-        print(f"✓ Gemini AI analyzer initialized (Model: gemini-2.0-flash-exp)")
+        print(f"✓ Gemini AI analyzer initialized (Model: models/gemini-2.5-flash)")
 
     def _format_market_data(self, market_data: Dict) -> str:
         """
@@ -305,7 +305,7 @@ Respond with ONLY valid JSON (no markdown formatting, no code blocks, no explana
 
             # Add metadata
             analysis['_metadata'] = {
-                'model': 'gemini-2.0-flash-exp',
+                'model': 'models/gemini-2.5-flash',
                 'analyzed_at': datetime.now().isoformat(),
                 'prompt_tokens': len(prompt.split()),
                 'symbol': market_data.get('symbol', 'BTCUSDT')
