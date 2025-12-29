@@ -14,7 +14,9 @@ from bot.formatters import (
     format_welcome_message,
     format_help_message,
     format_educational_analysis,
-    format_advanced_analysis
+    format_advanced_analysis,
+    format_raw_data_only,
+    format_raw_data_with_ai
 )
 import logging
 
@@ -321,6 +323,99 @@ class QuantraBot:
             await update.message.reply_text(error_msg, parse_mode=ParseMode.MARKDOWN)
             logger.error(f"Error processing /q3 for user {user_id}: {e}", exc_info=True)
 
+    async def q4_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """
+        Handle /q4 command - Raw market data with optional AI explanations
+        /q4 BTC -> raw data only (no AI)
+        /q4 ai BTC -> raw data + AI explanations
+        """
+        user_id = update.effective_user.id
+        logger.info(f"User {user_id} requested raw data: {' '.join(context.args)}")
+
+        try:
+            # Check if command has arguments
+            if not context.args:
+                await update.message.reply_text(
+                    "📊 *QUANTRA-4 RAW DATA*\n\n"
+                    "*Usage:*\n"
+                    "/q4 BTC - Raw data only (no AI)\n"
+                    "/q4 ai BTC - Raw data + AI explanations\n\n"
+                    "*Examples:*\n"
+                    "/q4 BTC\n"
+                    "/q4 ai BTC\n"
+                    "/q4 ai ETH",
+                    parse_mode=ParseMode.MARKDOWN
+                )
+                return
+
+            # Check for 'ai' keyword
+            use_ai = False
+            symbol_arg = context.args[0].upper()
+
+            if symbol_arg == 'AI' and len(context.args) > 1:
+                use_ai = True
+                symbol = context.args[1].upper()
+            else:
+                symbol = symbol_arg
+
+            # Normalize symbol (add USDT if needed)
+            if not symbol.endswith('USDT'):
+                symbol = f"{symbol}USDT"
+
+            # Send processing message
+            if use_ai:
+                processing_msg = await update.message.reply_text(
+                    f"📊 Fetching raw data + AI analysis for {symbol}...",
+                    parse_mode=ParseMode.MARKDOWN
+                )
+            else:
+                processing_msg = await update.message.reply_text(
+                    f"📊 Fetching raw market data for {symbol}...",
+                    parse_mode=ParseMode.MARKDOWN
+                )
+
+            # Initialize clients
+            self._init_clients()
+
+            # Fetch market data - always include CVD for /q4
+            logger.info(f"Fetching market data for {symbol}")
+            market_data = self.binance_client.get_market_overview(symbol, include_advanced=True)
+
+            # Format messages based on mode
+            if use_ai:
+                # MODE 2: With AI explanations
+                logger.info(f"Generating AI interpretation for {symbol}")
+                ai_analysis = self.gemini_analyzer.analyze_raw_data(market_data)
+                messages = format_raw_data_with_ai(market_data, ai_analysis, symbol)
+            else:
+                # MODE 1: Raw data only
+                messages = format_raw_data_only(market_data, symbol)
+
+            # Delete processing message
+            await processing_msg.delete()
+
+            # Send both messages
+            for message in messages:
+                await update.message.reply_text(
+                    message,
+                    parse_mode=ParseMode.MARKDOWN
+                )
+
+            logger.info(f"Successfully sent raw data for {symbol} to user {user_id} (AI: {use_ai})")
+
+        except ValueError as e:
+            error_msg = format_error_message(str(e), symbol if 'symbol' in locals() else 'UNKNOWN')
+            await update.message.reply_text(error_msg, parse_mode=ParseMode.MARKDOWN)
+            logger.error(f"Validation error for user {user_id}: {e}")
+
+        except Exception as e:
+            error_msg = format_error_message(
+                f"An unexpected error occurred: {str(e)}",
+                symbol if 'symbol' in locals() else 'UNKNOWN'
+            )
+            await update.message.reply_text(error_msg, parse_mode=ParseMode.MARKDOWN)
+            logger.error(f"Error processing /q4 for user {user_id}: {e}", exc_info=True)
+
     def run(self):
         """
         Start the bot and begin polling for messages
@@ -336,9 +431,10 @@ class QuantraBot:
         application.add_handler(CommandHandler("q1", self.q1_command))
         application.add_handler(CommandHandler("q2", self.q2_command))
         application.add_handler(CommandHandler("q3", self.q3_command))
+        application.add_handler(CommandHandler("q4", self.q4_command))
 
         logger.info("✓ Bot commands registered")
-        logger.info("Commands: /start, /help, /q1, /q2, /q3")
+        logger.info("Commands: /start, /help, /q1, /q2, /q3, /q4")
 
         # Start polling
         logger.info("🚀 Bot is now running. Press Ctrl+C to stop.")

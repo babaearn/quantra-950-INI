@@ -760,3 +760,78 @@ Be technical. Be precise. Quantify everything. This is for professional traders.
         except Exception as e:
             print(f"✗ Error during advanced analysis: {e}")
             raise
+
+    def analyze_raw_data(self, market_data: Dict) -> Dict:
+        """
+        QUANTRA-4: Educational raw data interpretation
+        AI explains what each metric means without predictions
+        
+        Args:
+            market_data: Market data dictionary from BinanceClient
+
+        Returns:
+            Dict with educational interpretations of raw data
+        """
+        RAW_DATA_PROMPT = """You are an educational market data analyst. Your job is to explain what raw market data means RIGHT NOW - not to predict the future.
+
+🎯 YOUR MISSION
+For each metric provided, explain in 1-2 clear sentences:
+1. What the number means RIGHT NOW
+2. Whether it's bullish, bearish, or neutral
+3. What it suggests about current market structure
+
+Keep explanations simple and educational. No predictions - just data interpretation.
+
+📋 OUTPUT FORMAT (JSON)
+{
+  "price_interpretation": "1-2 sentences about what current price action suggests",
+  "oi_interpretation": "1-2 sentences about what OI tells us about market positioning",
+  "funding_interpretation": "1-2 sentences about what funding rate reveals",
+  "positioning_interpretation": "1-2 sentences about top trader vs retail positioning",
+  "orderbook_interpretation": "1-2 sentences about bid/ask balance",
+  "flow_interpretation": "1-2 sentences about CVD and trade flow",
+  "key_takeaways": ["3-4 bullet points of most important insights"],
+  "what_to_watch": ["3-4 bullet points of key metrics to monitor"]
+}
+
+Remember: NO predictions. Just explain what the data shows RIGHT NOW."""
+
+        try:
+            # Format market data into prompt
+            prompt = self._format_market_data(market_data)
+            
+            # Add CVD if available
+            if market_data.get('cvd_trend'):
+                cvd = market_data['cvd_trend']
+                prompt += f"\n\n💹 TRADE FLOW (CVD):\n"
+                prompt += f"1H CVD: {cvd.get('1h', 0):,.2f} BTC ({cvd.get('trend_1h', 'neutral')})\n"
+                prompt += f"4H CVD: {cvd.get('4h', 0):,.2f} BTC ({cvd.get('trend_4h', 'neutral')})\n"
+                prompt += f"24H CVD: {cvd.get('24h', 0):,.2f} BTC ({cvd.get('trend_24h', 'neutral')})\n"
+
+            print("\n📚 Generating educational data interpretation with QUANTRA-4...")
+
+            response = self.model.generate_content([RAW_DATA_PROMPT, prompt])
+            response_text = response.text.strip()
+
+            # Clean response
+            if response_text.startswith('```json'):
+                response_text = response_text.replace('```json', '').replace('```', '').strip()
+            elif response_text.startswith('```'):
+                response_text = response_text.replace('```', '').strip()
+
+            analysis = json.loads(response_text)
+
+            # Add metadata
+            analysis['_metadata'] = {
+                'mode': 'raw_data',
+                'model': 'gemini-2.5-flash-lite',
+                'analyzed_at': datetime.now().isoformat(),
+                'symbol': market_data.get('symbol', 'BTCUSDT')
+            }
+
+            print(f"✓ Raw data interpretation complete")
+            return analysis
+
+        except Exception as e:
+            print(f"✗ Error during raw data analysis: {e}")
+            raise

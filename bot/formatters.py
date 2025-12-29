@@ -168,7 +168,7 @@ _AI-Powered Crypto Trading Intelligence_
 
 ━━━━━━━━━━━━━━━━━━━━
 
-*THREE ANALYSIS MODES*
+*FOUR ANALYSIS MODES*
 
 /q1 BTC - Quick Signal
 🎯 Fast trading signals with entry/stop/targets
@@ -178,6 +178,9 @@ _AI-Powered Crypto Trading Intelligence_
 
 /q3 BTC - Advanced Technical
 📊 Deep orderbook, CVD, funding analysis
+
+/q4 BTC - Raw Data
+📊 Pure market data with optional AI insights
 
 ━━━━━━━━━━━━━━━━━━━━
 
@@ -190,11 +193,12 @@ _AI-Powered Crypto Trading Intelligence_
 🎯 High-conviction trade setups
 🎓 Educational market insights
 📊 Advanced technical deep dives
+📈 Raw data mode (save AI quota)
 
 ━━━━━━━━━━━━━━━━━━━━
 
 *HOW IT WORKS*
-1. Choose your mode: /q1, /q2, or /q3
+1. Choose your mode: /q1, /q2, /q3, or /q4
 2. AI analyzes real-time market data
 3. Get structured analysis
 4. Make informed decisions
@@ -203,7 +207,7 @@ _AI-Powered Crypto Trading Intelligence_
 
 Ready to receive alpha! 🎯
 
-Try: /q1 BTC | /q2 BTC | /q3 BTC"""
+Try: /q1 BTC | /q2 BTC | /q3 BTC | /q4 BTC"""
 
 
 def format_help_message() -> str:
@@ -224,6 +228,8 @@ def format_help_message() -> str:
 /q1 <SYMBOL> - Quick AI signal
 /q2 <SYMBOL> - Educational analysis
 /q3 <SYMBOL> - Advanced technical
+/q4 <SYMBOL> - Raw data (no AI)
+/q4 ai <SYMBOL> - Raw data + AI
 
 ━━━━━━━━━━━━━━━━━━━━
 
@@ -232,6 +238,8 @@ def format_help_message() -> str:
 /q1 BTC - Quick trading signal
 /q2 BTC - Deep market psychology
 /q3 BTC - Technical deep dive
+/q4 BTC - Raw data only
+/q4 ai BTC - Raw data + AI explanations
 
 ━━━━━━━━━━━━━━━━━━━━
 
@@ -258,6 +266,13 @@ def format_help_message() -> str:
 Always use stop losses!
 Position size based on confidence
 Never risk more than 1-2% per trade
+
+━━━━━━━━━━━━━━━━━━━━
+
+*SAVE AI QUOTA*
+
+Use /q4 BTC for raw data without using AI quota
+Use /q4 ai BTC when you want AI interpretation
 
 ━━━━━━━━━━━━━━━━━━━━
 
@@ -296,22 +311,22 @@ def format_educational_analysis(analysis: Dict, symbol: str = "BTCUSDT") -> List
 
         if wh.get('price_action'):
             part1_lines.append(f"Price Action:")
-            part1_lines.append(f"_{wh['price_action']}_")
+            part1_lines.append(f"{wh['price_action']}")
             part1_lines.append("")
 
         if wh.get('volume_trend'):
             part1_lines.append(f"Volume Trend:")
-            part1_lines.append(f"_{wh['volume_trend']}_")
+            part1_lines.append(f"{wh['volume_trend']}")
             part1_lines.append("")
 
         if wh.get('volatility'):
             part1_lines.append(f"Volatility:")
-            part1_lines.append(f"_{wh['volatility']}_")
+            part1_lines.append(f"{wh['volatility']}")
             part1_lines.append("")
 
         if wh.get('smart_money'):
             part1_lines.append(f"Smart Money Activity:")
-            part1_lines.append(f"_{wh['smart_money']}_")
+            part1_lines.append(f"{wh['smart_money']}")
 
         part1_lines.append("")
         part1_lines.append("━━━━━━━━━━━━━━━━━━━━")
@@ -325,17 +340,17 @@ def format_educational_analysis(analysis: Dict, symbol: str = "BTCUSDT") -> List
 
         if sm.get('institution_activity'):
             part1_lines.append(f"What Institutions Are Doing:")
-            part1_lines.append(f"_{sm['institution_activity']}_")
+            part1_lines.append(f"{sm['institution_activity']}")
             part1_lines.append("")
 
         if sm.get('orderbook_psychology'):
             part1_lines.append(f"Order Book Psychology:")
-            part1_lines.append(f"_{sm['orderbook_psychology']}_")
+            part1_lines.append(f"{sm['orderbook_psychology']}")
             part1_lines.append("")
 
         if sm.get('whale_activity'):
             part1_lines.append(f"Whale Activity:")
-            part1_lines.append(f"_{sm['whale_activity']}_")
+            part1_lines.append(f"{sm['whale_activity']}")
 
         part1_lines.append("")
         part1_lines.append("━━━━━━━━━━━━━━━━━━━━")
@@ -358,12 +373,12 @@ def format_educational_analysis(analysis: Dict, symbol: str = "BTCUSDT") -> List
 
         if mp.get('crowd_behavior'):
             part2_lines.append(f"Crowd Behavior:")
-            part2_lines.append(f"_{mp['crowd_behavior']}_")
+            part2_lines.append(f"{mp['crowd_behavior']}")
             part2_lines.append("")
 
         if mp.get('sentiment'):
             part2_lines.append(f"Sentiment:")
-            part2_lines.append(f"_{mp['sentiment']}_")
+            part2_lines.append(f"{mp['sentiment']}")
             part2_lines.append("")
 
         if mp.get('potential_traps'):
@@ -383,17 +398,17 @@ def format_educational_analysis(analysis: Dict, symbol: str = "BTCUSDT") -> List
 
         if kd.get('technical'):
             part2_lines.append(f"Technical Metrics:")
-            part2_lines.append(f"_{kd['technical']}_")
+            part2_lines.append(f"{kd['technical']}")
             part2_lines.append("")
 
         if kd.get('derivatives'):
             part2_lines.append(f"Derivatives Data:")
-            part2_lines.append(f"_{kd['derivatives']}_")
+            part2_lines.append(f"{kd['derivatives']}")
             part2_lines.append("")
 
         if kd.get('volume_profile'):
             part2_lines.append(f"Volume Profile:")
-            part2_lines.append(f"_{kd['volume_profile']}_")
+            part2_lines.append(f"{kd['volume_profile']}")
 
         part2_lines.append("")
         part2_lines.append("━━━━━━━━━━━━━━━━━━━━")
@@ -407,7 +422,7 @@ def format_educational_analysis(analysis: Dict, symbol: str = "BTCUSDT") -> List
 
         if ei.get('what_this_means'):
             part2_lines.append(f"What This Means:")
-            part2_lines.append(f"_{ei['what_this_means']}_")
+            part2_lines.append(f"{ei['what_this_means']}")
             part2_lines.append("")
 
         if ei.get('things_to_watch'):
@@ -418,7 +433,7 @@ def format_educational_analysis(analysis: Dict, symbol: str = "BTCUSDT") -> List
 
         if ei.get('market_context'):
             part2_lines.append(f"Market Context:")
-            part2_lines.append(f"_{ei['market_context']}_")
+            part2_lines.append(f"{ei['market_context']}")
 
         part2_lines.append("")
         part2_lines.append("━━━━━━━━━━━━━━━━━━━━")
@@ -432,17 +447,17 @@ def format_educational_analysis(analysis: Dict, symbol: str = "BTCUSDT") -> List
 
         if en.get('learning'):
             part2_lines.append(f"What I'm Learning:")
-            part2_lines.append(f"_{en['learning']}_")
+            part2_lines.append(f"{en['learning']}")
             part2_lines.append("")
 
         if en.get('pattern_success'):
             part2_lines.append(f"Pattern Success:")
-            part2_lines.append(f"_{en['pattern_success']}_")
+            part2_lines.append(f"{en['pattern_success']}")
             part2_lines.append("")
 
         if en.get('improvements'):
             part2_lines.append(f"Improving Analysis:")
-            part2_lines.append(f"_{en['improvements']}_")
+            part2_lines.append(f"{en['improvements']}")
 
         part2_lines.append("")
         part2_lines.append("━━━━━━━━━━━━━━━━━━━━")
@@ -451,7 +466,7 @@ def format_educational_analysis(analysis: Dict, symbol: str = "BTCUSDT") -> List
     if '_metadata' in analysis:
         meta = analysis['_metadata']
         part2_lines.append("")
-        part2_lines.append(f"🤖 Model: `{meta.get('model', 'N/A')}`")
+        part2_lines.append(f"🤖 Model: {meta.get('model', 'N/A')}")
 
     return ["\n".join(part1_lines), "\n".join(part2_lines)]
 
@@ -486,25 +501,25 @@ def format_advanced_analysis(analysis: Dict, symbol: str = "BTCUSDT") -> List[st
         if od.get('depth_1pct'):
             d1 = od['depth_1pct']
             part1_lines.append(f"1% Depth (Immediate Liquidity):")
-            part1_lines.append(f"• Bids: `{d1.get('bids', 'N/A')}`")
-            part1_lines.append(f"• Asks: `{d1.get('asks', 'N/A')}`")
-            part1_lines.append(f"• Ratio: `{d1.get('ratio', 'N/A')}`")
+            part1_lines.append(f"• Bids: {d1.get('bids', 'N/A')}")
+            part1_lines.append(f"• Asks: {d1.get('asks', 'N/A')}")
+            part1_lines.append(f"• Ratio: {d1.get('ratio', 'N/A')}")
             part1_lines.append(f"• {d1.get('imbalance', '')}")
             part1_lines.append("")
 
         if od.get('depth_2pct'):
             d2 = od['depth_2pct']
             part1_lines.append(f"2% Depth (Short-term):")
-            part1_lines.append(f"• Bids: `{d2.get('bids', 'N/A')}`")
-            part1_lines.append(f"• Asks: `{d2.get('asks', 'N/A')}`")
+            part1_lines.append(f"• Bids: {d2.get('bids', 'N/A')}")
+            part1_lines.append(f"• Asks: {d2.get('asks', 'N/A')}")
             part1_lines.append(f"• Key Zones: {d2.get('zones', 'N/A')}")
             part1_lines.append("")
 
         if od.get('depth_5pct'):
             d5 = od['depth_5pct']
             part1_lines.append(f"5% Depth (Major Liquidity):")
-            part1_lines.append(f"• Bids: `{d5.get('bids', 'N/A')}`")
-            part1_lines.append(f"• Asks: `{d5.get('asks', 'N/A')}`")
+            part1_lines.append(f"• Bids: {d5.get('bids', 'N/A')}")
+            part1_lines.append(f"• Asks: {d5.get('asks', 'N/A')}")
             part1_lines.append(f"• Walls: {d5.get('major_walls', 'N/A')}")
 
         part1_lines.append("")
@@ -516,12 +531,12 @@ def format_advanced_analysis(analysis: Dict, symbol: str = "BTCUSDT") -> List[st
         fh = analysis['funding_history']
         part1_lines.append("💰 *FUNDING RATE HISTORY*")
         part1_lines.append("")
-        part1_lines.append(f"Current: `{fh.get('current', 'N/A')}%`")
-        part1_lines.append(f"8H Trend: _{fh.get('trend_8h', 'N/A')}_")
-        part1_lines.append(f"Momentum: _{fh.get('momentum', 'N/A')}_")
-        part1_lines.append(f"Context: _{fh.get('extremes_context', 'N/A')}_")
+        part1_lines.append(f"Current: {fh.get('current', 'N/A')}%")
+        part1_lines.append(f"8H Trend: {fh.get('trend_8h', 'N/A')}")
+        part1_lines.append(f"Momentum: {fh.get('momentum', 'N/A')}")
+        part1_lines.append(f"Context: {fh.get('extremes_context', 'N/A')}")
         if fh.get('prediction'):
-            part1_lines.append(f"Prediction: _{fh['prediction']}_")
+            part1_lines.append(f"Prediction: {fh['prediction']}")
         part1_lines.append("")
         part1_lines.append("━━━━━━━━━━━━━━━━━━━━")
         part1_lines.append("")
@@ -531,12 +546,12 @@ def format_advanced_analysis(analysis: Dict, symbol: str = "BTCUSDT") -> List[st
         cs = analysis['confluence_score']
         part1_lines.append("🎯 *MULTI-TIMEFRAME CONFLUENCE*")
         part1_lines.append("")
-        part1_lines.append(f"1H Score: `{cs.get('timeframe_1h', 'N/A')}/100`")
-        part1_lines.append(f"4H Score: `{cs.get('timeframe_4h', 'N/A')}/100`")
-        part1_lines.append(f"8H Score: `{cs.get('timeframe_8h', 'N/A')}/100`")
-        part1_lines.append(f"Overall: `{cs.get('overall', 'N/A')}/100`")
+        part1_lines.append(f"1H Score: {cs.get('timeframe_1h', 'N/A')}/100")
+        part1_lines.append(f"4H Score: {cs.get('timeframe_4h', 'N/A')}/100")
+        part1_lines.append(f"8H Score: {cs.get('timeframe_8h', 'N/A')}/100")
+        part1_lines.append(f"Overall: {cs.get('overall', 'N/A')}/100")
         if cs.get('analysis'):
-            part1_lines.append(f"_{cs['analysis']}_")
+            part1_lines.append(f"{cs['analysis']}")
         part1_lines.append("")
         part1_lines.append("━━━━━━━━━━━━━━━━━━━━")
 
@@ -555,26 +570,12 @@ def format_advanced_analysis(analysis: Dict, symbol: str = "BTCUSDT") -> List[st
         cvd = analysis['cvd_analysis']
         part2_lines.append("📈 *CVD TREND ANALYSIS*")
         part2_lines.append("")
-        part2_lines.append(f"Current Delta: _{cvd.get('current_delta', 'N/A')}_")
-        part2_lines.append(f"1H Trend: _{cvd.get('trend_1h', 'N/A')}_")
-        part2_lines.append(f"4H Trend: _{cvd.get('trend_4h', 'N/A')}_")
-        part2_lines.append(f"24H Trend: _{cvd.get('trend_24h', 'N/A')}_")
+        part2_lines.append(f"Current Delta: {cvd.get('current_delta', 'N/A')}")
+        part2_lines.append(f"1H Trend: {cvd.get('trend_1h', 'N/A')}")
+        part2_lines.append(f"4H Trend: {cvd.get('trend_4h', 'N/A')}")
+        part2_lines.append(f"24H Trend: {cvd.get('trend_24h', 'N/A')}")
         if cvd.get('divergences'):
-            part2_lines.append(f"Divergences: _{cvd['divergences']}_")
-        part2_lines.append("")
-        part2_lines.append("━━━━━━━━━━━━━━━━━━━━")
-        part2_lines.append("")
-
-    # OI Delta
-    if 'oi_delta' in analysis:
-        oi = analysis['oi_delta']
-        part2_lines.append("📊 *OPEN INTEREST DELTA*")
-        part2_lines.append("")
-        part2_lines.append(f"1H: `{oi.get('delta_1h', 'N/A')}`")
-        part2_lines.append(f"4H: `{oi.get('delta_4h', 'N/A')}`")
-        part2_lines.append(f"24H: `{oi.get('delta_24h', 'N/A')}`")
-        part2_lines.append(f"Correlation: _{oi.get('correlation', 'N/A')}_")
-        part2_lines.append(f"_{oi.get('interpretation', '')}_")
+            part2_lines.append(f"Divergences: {cvd['divergences']}")
         part2_lines.append("")
         part2_lines.append("━━━━━━━━━━━━━━━━━━━━")
         part2_lines.append("")
@@ -588,25 +589,25 @@ def format_advanced_analysis(analysis: Dict, symbol: str = "BTCUSDT") -> List[st
         if rr.get('support_levels'):
             part2_lines.append(f"Support Levels:")
             for level in rr['support_levels']:
-                part2_lines.append(f"• `{level}`")
+                part2_lines.append(f"• {level}")
             part2_lines.append("")
 
         if rr.get('resistance_levels'):
             part2_lines.append(f"Resistance Levels:")
             for level in rr['resistance_levels']:
-                part2_lines.append(f"• `{level}`")
+                part2_lines.append(f"• {level}")
             part2_lines.append("")
 
         if rr.get('high_probability_zones'):
-            part2_lines.append(f"High Probability: _{rr['high_probability_zones']}_")
+            part2_lines.append(f"High Probability: {rr['high_probability_zones']}")
             part2_lines.append("")
 
         if rr.get('invalidation'):
-            part2_lines.append(f"Invalidation: _{rr['invalidation']}_")
+            part2_lines.append(f"Invalidation: {rr['invalidation']}")
             part2_lines.append("")
 
         if rr.get('position_sizing'):
-            part2_lines.append(f"Position Sizing: _{rr['position_sizing']}_")
+            part2_lines.append(f"Position Sizing: {rr['position_sizing']}")
 
         part2_lines.append("")
         part2_lines.append("━━━━━━━━━━━━━━━━━━━━")
@@ -615,6 +616,269 @@ def format_advanced_analysis(analysis: Dict, symbol: str = "BTCUSDT") -> List[st
     if '_metadata' in analysis:
         meta = analysis['_metadata']
         part2_lines.append("")
-        part2_lines.append(f"🤖 Model: `{meta.get('model', 'N/A')}`")
+        part2_lines.append(f"🤖 Model: {meta.get('model', 'N/A')}")
+
+    return ["\n".join(part1_lines), "\n".join(part2_lines)]
+
+def format_raw_data_only(market_data: Dict, symbol: str = "BTCUSDT") -> List[str]:
+    """
+    Format raw market data without AI explanations (QUANTRA-4 mode 1)
+
+    Args:
+        market_data: Market data dictionary from BinanceClient
+        symbol: Trading symbol
+
+    Returns:
+        List of 2 formatted message strings for Telegram
+    """
+    ticker = market_data.get('ticker', {})
+    oi = market_data.get('open_interest', {})
+    funding = market_data.get('funding_rate', {})
+    ratio = market_data.get('long_short_ratio', {})
+    orderbook = market_data.get('orderbook', {})
+    cvd = market_data.get('cvd_trend', {}) if market_data.get('cvd_trend') else {}
+
+    # PART 1: Price, OI, Funding, Positioning
+    part1_lines = [
+        "📊 *QUANTRA-4 RAW DATA*",
+        f"Symbol: {symbol}",
+        "",
+        "*Part 1 of 2*",
+        "━━━━━━━━━━━━━━━━━━━━",
+        "",
+        "💰 *PRICE DATA*",
+        f"Current: ${ticker.get('last_price', 0):,.2f}",
+        f"24h High: ${ticker.get('high_price', 0):,.2f}",
+        f"24h Low: ${ticker.get('low_price', 0):,.2f}",
+        f"24h Change: {ticker.get('price_change_percent', 0):+.2f}%",
+        f"24h Volume: {ticker.get('volume', 0):,.2f} BTC",
+        f"24h Turnover: ${ticker.get('quote_volume', 0) / 1e9:.2f}B",
+        "",
+        "What this means:",
+        "Price near 24h low = selling pressure",
+        "High volume = active market participation",
+        "",
+        "━━━━━━━━━━━━━━━━━━━━",
+        "",
+        "📊 *OPEN INTEREST*",
+        f"Current OI: {oi.get('open_interest', 0):,.2f} BTC",
+        f"OI Value: ${oi.get('open_interest_value', 0) / 1e9:.2f}B",
+        "",
+        "What this means:",
+        "Rising OI + rising price = strong trend",
+        "Rising OI + flat price = big move coming",
+        "",
+        "━━━━━━━━━━━━━━━━━━━━",
+        "",
+        "💸 *FUNDING RATE*",
+        f"Current: {funding.get('funding_rate_percent', 0):.4f}%",
+        f"Annualized: {funding.get('annualized_rate', 0):.2f}%",
+        "",
+        "What this means:",
+        "Positive = longs pay shorts (bullish bias)",
+        ">0.05% = overheated longs",
+        "<-0.05% = overheated shorts",
+        "",
+        "━━━━━━━━━━━━━━━━━━━━",
+        "",
+        "⚖️ *POSITIONING*",
+        "Top Traders:",
+        f"• Long: {ratio.get('long_ratio', 0) * 100:.1f}%",
+        f"• Short: {ratio.get('short_ratio', 0) * 100:.1f}%",
+        f"• Ratio: {ratio.get('long_short_ratio', 0):.2f}:1",
+        "",
+        "What this means:",
+        "Extreme retail positioning = contrarian signal",
+        "Follow smart money when divergence occurs",
+        "",
+        "━━━━━━━━━━━━━━━━━━━━"
+    ]
+
+    # PART 2: Orderbook, Trade Flow, Guide
+    part2_lines = [
+        "📊 *QUANTRA-4 RAW DATA*",
+        f"Symbol: {symbol}",
+        "",
+        "*Part 2 of 2*",
+        "━━━━━━━━━━━━━━━━━━━━",
+        "",
+        "📖 *ORDERBOOK*",
+        f"Best Bid: ${orderbook.get('best_bid', 0):,.2f}",
+        f"Best Ask: ${orderbook.get('best_ask', 0):,.2f}",
+        f"Spread: ${orderbook.get('spread', 0):.2f}",
+        f"Bid/Ask Ratio: {orderbook.get('bid_ask_ratio', 0):.2f}",
+        "",
+        "What this means:",
+        "Ratio >1.0 = more buyers (bullish)",
+        "Ratio <1.0 = more sellers (bearish)",
+        "",
+        "━━━━━━━━━━━━━━━━━━━━",
+        ""
+    ]
+
+    # Add CVD if available
+    if cvd:
+        part2_lines.extend([
+            "📈 *TRADE FLOW (CVD)*",
+            f"1H: {cvd.get('1h', 0):+,.2f} BTC ({cvd.get('trend_1h', 'neutral')})",
+            f"4H: {cvd.get('4h', 0):+,.2f} BTC ({cvd.get('trend_4h', 'neutral')})",
+            f"24H: {cvd.get('24h', 0):+,.2f} BTC ({cvd.get('trend_24h', 'neutral')})",
+            "",
+            "What this means:",
+            "Negative CVD = distribution (selling)",
+            "Positive CVD = accumulation (buying)",
+            "",
+            "━━━━━━━━━━━━━━━━━━━━",
+            ""
+        ])
+
+    part2_lines.extend([
+        "🔍 *QUICK GUIDE*",
+        "",
+        "*Bullish Signs:*",
+        "• Price rising + volume high",
+        "• OI rising with price",
+        "• Positive CVD trend",
+        "• Bid-heavy orderbook",
+        "",
+        "*Bearish Signs:*",
+        "• Price falling + volume high",
+        "• OI flat while price moves",
+        "• Negative CVD trend",
+        "• Ask-heavy orderbook",
+        "",
+        "*Reversal Signs:*",
+        "• Extreme funding (>0.05%)",
+        "• Extreme L/S ratio (>3:1)",
+        "• CVD divergence from price",
+        "",
+        "━━━━━━━━━━━━━━━━━━━━",
+        f"⏱ Snapshot: {datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC')}"
+    ])
+
+    return ["\n".join(part1_lines), "\n".join(part2_lines)]
+
+
+def format_raw_data_with_ai(market_data: Dict, ai_analysis: Dict, symbol: str = "BTCUSDT") -> List[str]:
+    """
+    Format raw market data WITH AI explanations (QUANTRA-4 mode 2)
+
+    Args:
+        market_data: Market data dictionary from BinanceClient
+        ai_analysis: AI analysis dictionary from GeminiAnalyzer
+        symbol: Trading symbol
+
+    Returns:
+        List of 2 formatted message strings for Telegram
+    """
+    ticker = market_data.get('ticker', {})
+    oi = market_data.get('open_interest', {})
+    funding = market_data.get('funding_rate', {})
+    ratio = market_data.get('long_short_ratio', {})
+    orderbook = market_data.get('orderbook', {})
+    cvd = market_data.get('cvd_trend', {}) if market_data.get('cvd_trend') else {}
+
+    # PART 1: Price, OI, Funding, Positioning with AI
+    part1_lines = [
+        "📊 *QUANTRA-4 RAW DATA + AI*",
+        f"Symbol: {symbol}",
+        "",
+        "*Part 1 of 2*",
+        "━━━━━━━━━━━━━━━━━━━━",
+        "",
+        "💰 *PRICE DATA*",
+        f"Current: ${ticker.get('last_price', 0):,.2f}",
+        f"24h High: ${ticker.get('high_price', 0):,.2f}",
+        f"24h Low: ${ticker.get('low_price', 0):,.2f}",
+        f"24h Change: {ticker.get('price_change_percent', 0):+.2f}%",
+        "",
+        "🤖 AI Insight:",
+        f"{ai_analysis.get('price_interpretation', 'N/A')}",
+        "",
+        "━━━━━━━━━━━━━━━━━━━━",
+        "",
+        "📊 *OPEN INTEREST*",
+        f"Current: {oi.get('open_interest', 0):,.2f} BTC",
+        f"Value: ${oi.get('open_interest_value', 0) / 1e9:.2f}B",
+        "",
+        "🤖 AI Insight:",
+        f"{ai_analysis.get('oi_interpretation', 'N/A')}",
+        "",
+        "━━━━━━━━━━━━━━━━━━━━",
+        "",
+        "💸 *FUNDING RATE*",
+        f"Current: {funding.get('funding_rate_percent', 0):.4f}%",
+        "",
+        "🤖 AI Insight:",
+        f"{ai_analysis.get('funding_interpretation', 'N/A')}",
+        "",
+        "━━━━━━━━━━━━━━━━━━━━",
+        "",
+        "⚖️ *POSITIONING*",
+        f"Top Traders: {ratio.get('long_short_ratio', 0):.2f}:1",
+        "",
+        "🤖 AI Insight:",
+        f"{ai_analysis.get('positioning_interpretation', 'N/A')}",
+        "",
+        "━━━━━━━━━━━━━━━━━━━━"
+    ]
+
+    # PART 2: Orderbook, CVD, Takeaways with AI
+    part2_lines = [
+        "📊 *QUANTRA-4 RAW DATA + AI*",
+        f"Symbol: {symbol}",
+        "",
+        "*Part 2 of 2*",
+        "━━━━━━━━━━━━━━━━━━━━",
+        "",
+        "📖 *ORDERBOOK*",
+        f"Bid/Ask Ratio: {orderbook.get('bid_ask_ratio', 0):.2f}",
+        "",
+        "🤖 AI Insight:",
+        f"{ai_analysis.get('orderbook_interpretation', 'N/A')}",
+        "",
+        "━━━━━━━━━━━━━━━━━━━━",
+        ""
+    ]
+
+    # Add CVD if available
+    if cvd:
+        part2_lines.extend([
+            "📈 *CVD FLOW*",
+            f"1H: {cvd.get('1h', 0):+,.2f} BTC",
+            f"4H: {cvd.get('4h', 0):+,.2f} BTC",
+            f"24H: {cvd.get('24h', 0):+,.2f} BTC",
+            "",
+            "🤖 AI Insight:",
+            f"{ai_analysis.get('flow_interpretation', 'N/A')}",
+            "",
+            "━━━━━━━━━━━━━━━━━━━━",
+            ""
+        ])
+
+    # Add key takeaways
+    part2_lines.extend([
+        "💡 *KEY TAKEAWAYS*"
+    ])
+
+    for takeaway in ai_analysis.get('key_takeaways', []):
+        part2_lines.append(f"• {takeaway}")
+
+    part2_lines.extend([
+        "",
+        "━━━━━━━━━━━━━━━━━━━━",
+        "",
+        "👀 *WHAT TO WATCH*"
+    ])
+
+    for watch_item in ai_analysis.get('what_to_watch', []):
+        part2_lines.append(f"• {watch_item}")
+
+    part2_lines.extend([
+        "",
+        "━━━━━━━━━━━━━━━━━━━━",
+        f"🤖 Model: {ai_analysis.get('_metadata', {}).get('model', 'gemini-2.5-flash-lite')}",
+        f"⏱ Analyzed: {datetime.now().strftime('%Y-%m-%d %H:%M:%S UTC')}"
+    ])
 
     return ["\n".join(part1_lines), "\n".join(part2_lines)]
