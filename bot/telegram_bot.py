@@ -218,17 +218,18 @@ class QuantraBot:
             logger.info(f"Generating educational analysis for {symbol}")
             analysis = self.gemini_analyzer.analyze_educational(market_data)
 
-            # Format and send response
-            message = format_educational_analysis(analysis, symbol)
+            # Format response (returns list of 2 messages)
+            messages = format_educational_analysis(analysis, symbol)
 
             # Delete processing message
             await processing_msg.delete()
 
-            # Send analysis
-            await update.message.reply_text(
-                message,
-                parse_mode=ParseMode.MARKDOWN
-            )
+            # Send both messages
+            for message in messages:
+                await update.message.reply_text(
+                    message,
+                    parse_mode=ParseMode.MARKDOWN
+                )
 
             logger.info(f"Successfully sent educational analysis for {symbol} to user {user_id}")
 
@@ -284,25 +285,26 @@ class QuantraBot:
             # Initialize clients if needed
             self._init_clients()
 
-            # Fetch market data from Binance
+            # Fetch market data from Binance with advanced calculations
             logger.info(f"Fetching market data for {symbol}")
-            market_data = self.binance_client.get_market_overview(symbol)
+            market_data = self.binance_client.get_market_overview(symbol, include_advanced=True)
 
             # Analyze with QUANTRA-3 (Advanced)
             logger.info(f"Generating advanced technical analysis for {symbol}")
             analysis = self.gemini_analyzer.analyze_advanced(market_data)
 
-            # Format and send response
-            message = format_advanced_analysis(analysis, symbol)
+            # Format response (returns list of 2 messages)
+            messages = format_advanced_analysis(analysis, symbol)
 
             # Delete processing message
             await processing_msg.delete()
 
-            # Send analysis
-            await update.message.reply_text(
-                message,
-                parse_mode=ParseMode.MARKDOWN
-            )
+            # Send both messages
+            for message in messages:
+                await update.message.reply_text(
+                    message,
+                    parse_mode=ParseMode.MARKDOWN
+                )
 
             logger.info(f"Successfully sent advanced analysis for {symbol} to user {user_id}")
 

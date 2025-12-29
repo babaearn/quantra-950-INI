@@ -562,6 +562,59 @@ Remember: NO trading signals. Pure education and understanding."""
             print(f"✗ Error during educational analysis: {e}")
             raise
 
+    def _format_advanced_data(self, market_data: Dict) -> str:
+        """
+        Format advanced market data with real calculated metrics
+
+        Args:
+            market_data: Market data with CVD, orderbook depth, OI delta
+
+        Returns:
+            Formatted string with calculated metrics
+        """
+        cvd = market_data.get('cvd_trend', {})
+        depth = market_data.get('orderbook_depth', {})
+        oi_delta = market_data.get('oi_delta', {})
+        ticker = market_data.get('ticker', {})
+        funding = market_data.get('funding_rate', {})
+
+        prompt = f"""
+📊 CALCULATED ADVANCED METRICS
+
+💹 CVD TREND (Cumulative Volume Delta)
+1H CVD: {cvd.get('1h', 0):,.2f} BTC ({cvd.get('trend_1h', 'neutral')})
+4H CVD: {cvd.get('4h', 0):,.2f} BTC ({cvd.get('trend_4h', 'neutral')})
+24H CVD: {cvd.get('24h', 0):,.2f} BTC ({cvd.get('trend_24h', 'neutral')})
+
+📖 ORDERBOOK DEPTH ANALYSIS
+1% Depth (±${ticker.get('last_price', 0) * 0.01:,.2f}):
+  Bids: {depth.get('1%', {}).get('bid_volume', 0):,.2f} BTC
+  Asks: {depth.get('1%', {}).get('ask_volume', 0):,.2f} BTC
+  Imbalance: {depth.get('1%', {}).get('imbalance', 0):,.2f}%
+
+2% Depth (±${ticker.get('last_price', 0) * 0.02:,.2f}):
+  Bids: {depth.get('2%', {}).get('bid_volume', 0):,.2f} BTC
+  Asks: {depth.get('2%', {}).get('ask_volume', 0):,.2f} BTC
+  Imbalance: {depth.get('2%', {}).get('imbalance', 0):,.2f}%
+
+5% Depth (±${ticker.get('last_price', 0) * 0.05:,.2f}):
+  Bids: {depth.get('5%', {}).get('bid_volume', 0):,.2f} BTC
+  Asks: {depth.get('5%', {}).get('ask_volume', 0):,.2f} BTC
+  Imbalance: {depth.get('5%', {}).get('imbalance', 0):,.2f}%
+
+📈 FUNDING RATE HISTORY
+Current Rate: {funding.get('funding_rate_percent', 0):.4f}%
+Annualized: {funding.get('annualized_rate', 0):.2f}%
+
+📊 OPEN INTEREST DELTA
+Current OI: {oi_delta.get('current_oi', 0):,.2f} BTC
+1H Delta: {oi_delta.get('delta_1h', 'N/A')}
+4H Delta: {oi_delta.get('delta_4h', 'N/A')}
+24H Delta: {oi_delta.get('delta_24h', 'N/A')}
+Note: {oi_delta.get('note', '')}
+"""
+        return prompt
+
     def analyze_advanced(self, market_data: Dict) -> Dict:
         """
         QUANTRA-3: Advanced technical analysis
@@ -569,7 +622,7 @@ Remember: NO trading signals. Pure education and understanding."""
         For professional traders and researchers
 
         Args:
-            market_data: Market data dictionary from BinanceClient
+            market_data: Market data dictionary from BinanceClient (with include_advanced=True)
 
         Returns:
             Dict with advanced technical analysis
@@ -671,10 +724,18 @@ Deliver deep technical analysis of crypto derivatives markets with multi-level o
 Be technical. Be precise. Quantify everything. This is for professional traders."""
 
         try:
-            prompt = self._format_market_data(market_data)
+            # Format basic market data
+            base_prompt = self._format_market_data(market_data)
+
+            # Add advanced calculated metrics
+            advanced_prompt = self._format_advanced_data(market_data)
+
+            # Combine prompts
+            full_prompt = base_prompt + "\n" + advanced_prompt
+
             print("\n📊 Generating advanced technical analysis with QUANTRA-3...")
 
-            response = self.model.generate_content([ADVANCED_PROMPT, prompt])
+            response = self.model.generate_content([ADVANCED_PROMPT, full_prompt])
             response_text = response.text.strip()
 
             # Clean response

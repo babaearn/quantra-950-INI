@@ -2,7 +2,7 @@
 Message formatters for Telegram bot
 Converts analysis data to formatted Telegram messages
 """
-from typing import Dict
+from typing import Dict, List
 from datetime import datetime
 
 
@@ -264,24 +264,26 @@ Never risk more than 1-2% per trade
 Need more help? Contact support."""
 
 
-def format_educational_analysis(analysis: Dict, symbol: str = "BTCUSDT") -> str:
+def format_educational_analysis(analysis: Dict, symbol: str = "BTCUSDT") -> List[str]:
     """
-    Format QUANTRA-2 educational analysis into Telegram message
+    Format QUANTRA-2 educational analysis into Telegram messages (2 parts)
 
     Args:
         analysis: Educational analysis dictionary from GeminiAnalyzer
         symbol: Trading symbol
 
     Returns:
-        Formatted message string for Telegram
+        List of 2 formatted message strings for Telegram
     """
     price = analysis.get('price', 'N/A')
 
-    lines = [
-        "📊 *QUANTRA-2 DEEP ANALYSIS*",
+    # PART 1: What's Happening + Smart Money Insights
+    part1_lines = [
+        "📊 *QUANTRA-2 EDUCATIONAL ANALYSIS*",
         f"Symbol: `{symbol}`",
         f"Price: `${price}` " if price != 'N/A' else "",
         "",
+        "*Part 1 of 2*",
         "━━━━━━━━━━━━━━━━━━━━",
         ""
     ]
@@ -289,171 +291,188 @@ def format_educational_analysis(analysis: Dict, symbol: str = "BTCUSDT") -> str:
     # What's Happening Now
     if 'whats_happening' in analysis:
         wh = analysis['whats_happening']
-        lines.append("📈 *WHAT'S HAPPENING NOW*")
-        lines.append("")
+        part1_lines.append("📈 *WHAT'S HAPPENING NOW*")
+        part1_lines.append("")
 
         if wh.get('price_action'):
-            lines.append(f"Price Action:")
-            lines.append(f"_{wh['price_action']}_")
-            lines.append("")
+            part1_lines.append(f"Price Action:")
+            part1_lines.append(f"_{wh['price_action']}_")
+            part1_lines.append("")
 
         if wh.get('volume_trend'):
-            lines.append(f"Volume Trend:")
-            lines.append(f"_{wh['volume_trend']}_")
-            lines.append("")
+            part1_lines.append(f"Volume Trend:")
+            part1_lines.append(f"_{wh['volume_trend']}_")
+            part1_lines.append("")
 
         if wh.get('volatility'):
-            lines.append(f"Volatility:")
-            lines.append(f"_{wh['volatility']}_")
-            lines.append("")
+            part1_lines.append(f"Volatility:")
+            part1_lines.append(f"_{wh['volatility']}_")
+            part1_lines.append("")
 
         if wh.get('smart_money'):
-            lines.append(f"Smart Money Activity:")
-            lines.append(f"_{wh['smart_money']}_")
+            part1_lines.append(f"Smart Money Activity:")
+            part1_lines.append(f"_{wh['smart_money']}_")
 
-        lines.append("")
-        lines.append("━━━━━━━━━━━━━━━━━━━━")
-        lines.append("")
+        part1_lines.append("")
+        part1_lines.append("━━━━━━━━━━━━━━━━━━━━")
+        part1_lines.append("")
 
     # Smart Money Insights
     if 'smart_money_insights' in analysis:
         sm = analysis['smart_money_insights']
-        lines.append("🧠 *SMART MONEY INSIGHTS*")
-        lines.append("")
+        part1_lines.append("🧠 *SMART MONEY INSIGHTS*")
+        part1_lines.append("")
 
         if sm.get('institution_activity'):
-            lines.append(f"What Institutions Are Doing:")
-            lines.append(f"_{sm['institution_activity']}_")
-            lines.append("")
+            part1_lines.append(f"What Institutions Are Doing:")
+            part1_lines.append(f"_{sm['institution_activity']}_")
+            part1_lines.append("")
 
         if sm.get('orderbook_psychology'):
-            lines.append(f"Order Book Psychology:")
-            lines.append(f"_{sm['orderbook_psychology']}_")
-            lines.append("")
+            part1_lines.append(f"Order Book Psychology:")
+            part1_lines.append(f"_{sm['orderbook_psychology']}_")
+            part1_lines.append("")
 
         if sm.get('whale_activity'):
-            lines.append(f"Whale Activity:")
-            lines.append(f"_{sm['whale_activity']}_")
+            part1_lines.append(f"Whale Activity:")
+            part1_lines.append(f"_{sm['whale_activity']}_")
 
-        lines.append("")
-        lines.append("━━━━━━━━━━━━━━━━━━━━")
-        lines.append("")
+        part1_lines.append("")
+        part1_lines.append("━━━━━━━━━━━━━━━━━━━━")
+
+    # PART 2: Market Psychology + Educational Insights + Evolution
+    part2_lines = [
+        "📊 *QUANTRA-2 EDUCATIONAL ANALYSIS*",
+        f"Symbol: `{symbol}`",
+        "",
+        "*Part 2 of 2*",
+        "━━━━━━━━━━━━━━━━━━━━",
+        ""
+    ]
 
     # Market Psychology
     if 'market_psychology' in analysis:
         mp = analysis['market_psychology']
-        lines.append("🎭 *MARKET PSYCHOLOGY*")
-        lines.append("")
+        part2_lines.append("🎭 *MARKET PSYCHOLOGY*")
+        part2_lines.append("")
 
         if mp.get('crowd_behavior'):
-            lines.append(f"Crowd Behavior:")
-            lines.append(f"_{mp['crowd_behavior']}_")
-            lines.append("")
+            part2_lines.append(f"Crowd Behavior:")
+            part2_lines.append(f"_{mp['crowd_behavior']}_")
+            part2_lines.append("")
 
         if mp.get('sentiment'):
-            lines.append(f"Sentiment:")
-            lines.append(f"_{mp['sentiment']}_")
-            lines.append("")
+            part2_lines.append(f"Sentiment:")
+            part2_lines.append(f"_{mp['sentiment']}_")
+            part2_lines.append("")
 
         if mp.get('potential_traps'):
-            lines.append(f"Potential Traps:")
+            part2_lines.append(f"Potential Traps:")
             for trap in mp['potential_traps']:
-                lines.append(f"• {trap}")
+                part2_lines.append(f"• {trap}")
 
-        lines.append("")
-        lines.append("━━━━━━━━━━━━━━━━━━━━")
-        lines.append("")
+        part2_lines.append("")
+        part2_lines.append("━━━━━━━━━━━━━━━━━━━━")
+        part2_lines.append("")
 
     # Key Data Points
     if 'key_data' in analysis:
         kd = analysis['key_data']
-        lines.append("📊 *KEY DATA POINTS*")
-        lines.append("")
+        part2_lines.append("📊 *KEY DATA POINTS*")
+        part2_lines.append("")
 
         if kd.get('technical'):
-            lines.append(f"Technical Metrics:")
-            lines.append(f"_{kd['technical']}_")
-            lines.append("")
+            part2_lines.append(f"Technical Metrics:")
+            part2_lines.append(f"_{kd['technical']}_")
+            part2_lines.append("")
 
         if kd.get('derivatives'):
-            lines.append(f"Derivatives Data:")
-            lines.append(f"_{kd['derivatives']}_")
-            lines.append("")
+            part2_lines.append(f"Derivatives Data:")
+            part2_lines.append(f"_{kd['derivatives']}_")
+            part2_lines.append("")
 
         if kd.get('volume_profile'):
-            lines.append(f"Volume Profile:")
-            lines.append(f"_{kd['volume_profile']}_")
+            part2_lines.append(f"Volume Profile:")
+            part2_lines.append(f"_{kd['volume_profile']}_")
 
-        lines.append("")
-        lines.append("━━━━━━━━━━━━━━━━━━━━")
-        lines.append("")
+        part2_lines.append("")
+        part2_lines.append("━━━━━━━━━━━━━━━━━━━━")
+        part2_lines.append("")
 
     # Educational Insights
     if 'educational_insights' in analysis:
         ei = analysis['educational_insights']
-        lines.append("💡 *EDUCATIONAL INSIGHTS*")
-        lines.append("")
+        part2_lines.append("💡 *EDUCATIONAL INSIGHTS*")
+        part2_lines.append("")
 
         if ei.get('what_this_means'):
-            lines.append(f"What This Means:")
-            lines.append(f"_{ei['what_this_means']}_")
-            lines.append("")
+            part2_lines.append(f"What This Means:")
+            part2_lines.append(f"_{ei['what_this_means']}_")
+            part2_lines.append("")
 
         if ei.get('things_to_watch'):
-            lines.append(f"Things to Watch:")
+            part2_lines.append(f"Things to Watch:")
             for thing in ei['things_to_watch']:
-                lines.append(f"• {thing}")
-            lines.append("")
+                part2_lines.append(f"• {thing}")
+            part2_lines.append("")
 
         if ei.get('market_context'):
-            lines.append(f"Market Context:")
-            lines.append(f"_{ei['market_context']}_")
+            part2_lines.append(f"Market Context:")
+            part2_lines.append(f"_{ei['market_context']}_")
 
-        lines.append("")
-        lines.append("━━━━━━━━━━━━━━━━━━━━")
-        lines.append("")
+        part2_lines.append("")
+        part2_lines.append("━━━━━━━━━━━━━━━━━━━━")
+        part2_lines.append("")
 
     # Evolution Notes
     if 'evolution_notes' in analysis:
         en = analysis['evolution_notes']
-        lines.append("🔄 *EVOLUTION NOTES*")
-        lines.append("")
+        part2_lines.append("🔄 *EVOLUTION NOTES*")
+        part2_lines.append("")
 
         if en.get('learning'):
-            lines.append(f"What I'm Learning:")
-            lines.append(f"_{en['learning']}_")
-            lines.append("")
+            part2_lines.append(f"What I'm Learning:")
+            part2_lines.append(f"_{en['learning']}_")
+            part2_lines.append("")
 
         if en.get('pattern_success'):
-            lines.append(f"Pattern Success:")
-            lines.append(f"_{en['pattern_success']}_")
-            lines.append("")
+            part2_lines.append(f"Pattern Success:")
+            part2_lines.append(f"_{en['pattern_success']}_")
+            part2_lines.append("")
 
         if en.get('improvements'):
-            lines.append(f"Improving Analysis:")
-            lines.append(f"_{en['improvements']}_")
+            part2_lines.append(f"Improving Analysis:")
+            part2_lines.append(f"_{en['improvements']}_")
 
-        lines.append("")
-        lines.append("━━━━━━━━━━━━━━━━━━━━")
+        part2_lines.append("")
+        part2_lines.append("━━━━━━━━━━━━━━━━━━━━")
 
-    return "\n".join(lines)
+    # Add metadata to part 2
+    if '_metadata' in analysis:
+        meta = analysis['_metadata']
+        part2_lines.append("")
+        part2_lines.append(f"🤖 Model: `{meta.get('model', 'N/A')}`")
+
+    return ["\n".join(part1_lines), "\n".join(part2_lines)]
 
 
-def format_advanced_analysis(analysis: Dict, symbol: str = "BTCUSDT") -> str:
+def format_advanced_analysis(analysis: Dict, symbol: str = "BTCUSDT") -> List[str]:
     """
-    Format QUANTRA-3 advanced technical analysis into Telegram message
+    Format QUANTRA-3 advanced technical analysis into Telegram messages (2 parts)
 
     Args:
         analysis: Advanced analysis dictionary from GeminiAnalyzer
         symbol: Trading symbol
 
     Returns:
-        Formatted message string for Telegram
+        List of 2 formatted message strings for Telegram
     """
-    lines = [
+    # PART 1: Orderbook + Funding + Confluence
+    part1_lines = [
         "📊 *QUANTRA-3 TECHNICAL ANALYSIS*",
         f"Symbol: `{symbol}`",
         "",
+        "*Part 1 of 2*",
         "━━━━━━━━━━━━━━━━━━━━",
         ""
     ]
@@ -461,132 +480,141 @@ def format_advanced_analysis(analysis: Dict, symbol: str = "BTCUSDT") -> str:
     # Orderbook Depth
     if 'orderbook_depth' in analysis:
         od = analysis['orderbook_depth']
-        lines.append("📖 *ORDERBOOK DEPTH ANALYSIS*")
-        lines.append("")
+        part1_lines.append("📖 *ORDERBOOK DEPTH ANALYSIS*")
+        part1_lines.append("")
 
         if od.get('depth_1pct'):
             d1 = od['depth_1pct']
-            lines.append(f"1% Depth (Immediate Liquidity):")
-            lines.append(f"• Bids: `{d1.get('bids', 'N/A')}`")
-            lines.append(f"• Asks: `{d1.get('asks', 'N/A')}`")
-            lines.append(f"• Ratio: `{d1.get('ratio', 'N/A')}`")
-            lines.append(f"• {d1.get('imbalance', '')}")
-            lines.append("")
+            part1_lines.append(f"1% Depth (Immediate Liquidity):")
+            part1_lines.append(f"• Bids: `{d1.get('bids', 'N/A')}`")
+            part1_lines.append(f"• Asks: `{d1.get('asks', 'N/A')}`")
+            part1_lines.append(f"• Ratio: `{d1.get('ratio', 'N/A')}`")
+            part1_lines.append(f"• {d1.get('imbalance', '')}")
+            part1_lines.append("")
 
         if od.get('depth_2pct'):
             d2 = od['depth_2pct']
-            lines.append(f"2% Depth (Short-term):")
-            lines.append(f"• Bids: `{d2.get('bids', 'N/A')}`")
-            lines.append(f"• Asks: `{d2.get('asks', 'N/A')}`")
-            lines.append(f"• Key Zones: {d2.get('zones', 'N/A')}")
-            lines.append("")
+            part1_lines.append(f"2% Depth (Short-term):")
+            part1_lines.append(f"• Bids: `{d2.get('bids', 'N/A')}`")
+            part1_lines.append(f"• Asks: `{d2.get('asks', 'N/A')}`")
+            part1_lines.append(f"• Key Zones: {d2.get('zones', 'N/A')}")
+            part1_lines.append("")
 
         if od.get('depth_5pct'):
             d5 = od['depth_5pct']
-            lines.append(f"5% Depth (Major Liquidity):")
-            lines.append(f"• Bids: `{d5.get('bids', 'N/A')}`")
-            lines.append(f"• Asks: `{d5.get('asks', 'N/A')}`")
-            lines.append(f"• Walls: {d5.get('major_walls', 'N/A')}")
+            part1_lines.append(f"5% Depth (Major Liquidity):")
+            part1_lines.append(f"• Bids: `{d5.get('bids', 'N/A')}`")
+            part1_lines.append(f"• Asks: `{d5.get('asks', 'N/A')}`")
+            part1_lines.append(f"• Walls: {d5.get('major_walls', 'N/A')}")
 
-        lines.append("")
-        lines.append("━━━━━━━━━━━━━━━━━━━━")
-        lines.append("")
-
-    # CVD Analysis
-    if 'cvd_analysis' in analysis:
-        cvd = analysis['cvd_analysis']
-        lines.append("📈 *CVD TREND ANALYSIS*")
-        lines.append("")
-        lines.append(f"Current Delta: _{cvd.get('current_delta', 'N/A')}_")
-        lines.append(f"1H Trend: _{cvd.get('trend_1h', 'N/A')}_")
-        lines.append(f"4H Trend: _{cvd.get('trend_4h', 'N/A')}_")
-        lines.append(f"24H Trend: _{cvd.get('trend_24h', 'N/A')}_")
-        if cvd.get('divergences'):
-            lines.append(f"Divergences: _{cvd['divergences']}_")
-        lines.append("")
-        lines.append("━━━━━━━━━━━━━━━━━━━━")
-        lines.append("")
+        part1_lines.append("")
+        part1_lines.append("━━━━━━━━━━━━━━━━━━━━")
+        part1_lines.append("")
 
     # Funding History
     if 'funding_history' in analysis:
         fh = analysis['funding_history']
-        lines.append("💰 *FUNDING RATE HISTORY*")
-        lines.append("")
-        lines.append(f"Current: `{fh.get('current', 'N/A')}%`")
-        lines.append(f"8H Trend: _{fh.get('trend_8h', 'N/A')}_")
-        lines.append(f"Momentum: _{fh.get('momentum', 'N/A')}_")
-        lines.append(f"Context: _{fh.get('extremes_context', 'N/A')}_")
+        part1_lines.append("💰 *FUNDING RATE HISTORY*")
+        part1_lines.append("")
+        part1_lines.append(f"Current: `{fh.get('current', 'N/A')}%`")
+        part1_lines.append(f"8H Trend: _{fh.get('trend_8h', 'N/A')}_")
+        part1_lines.append(f"Momentum: _{fh.get('momentum', 'N/A')}_")
+        part1_lines.append(f"Context: _{fh.get('extremes_context', 'N/A')}_")
         if fh.get('prediction'):
-            lines.append(f"Prediction: _{fh['prediction']}_")
-        lines.append("")
-        lines.append("━━━━━━━━━━━━━━━━━━━━")
-        lines.append("")
-
-    # OI Delta
-    if 'oi_delta' in analysis:
-        oi = analysis['oi_delta']
-        lines.append("📊 *OPEN INTEREST DELTA*")
-        lines.append("")
-        lines.append(f"1H: `{oi.get('delta_1h', 'N/A')}`")
-        lines.append(f"4H: `{oi.get('delta_4h', 'N/A')}`")
-        lines.append(f"24H: `{oi.get('delta_24h', 'N/A')}`")
-        lines.append(f"Correlation: _{oi.get('correlation', 'N/A')}_")
-        lines.append(f"_{oi.get('interpretation', '')}_")
-        lines.append("")
-        lines.append("━━━━━━━━━━━━━━━━━━━━")
-        lines.append("")
+            part1_lines.append(f"Prediction: _{fh['prediction']}_")
+        part1_lines.append("")
+        part1_lines.append("━━━━━━━━━━━━━━━━━━━━")
+        part1_lines.append("")
 
     # Confluence Score
     if 'confluence_score' in analysis:
         cs = analysis['confluence_score']
-        lines.append("🎯 *MULTI-TIMEFRAME CONFLUENCE*")
-        lines.append("")
-        lines.append(f"1H Score: `{cs.get('timeframe_1h', 'N/A')}/100`")
-        lines.append(f"4H Score: `{cs.get('timeframe_4h', 'N/A')}/100`")
-        lines.append(f"8H Score: `{cs.get('timeframe_8h', 'N/A')}/100`")
-        lines.append(f"Overall: `{cs.get('overall', 'N/A')}/100`")
+        part1_lines.append("🎯 *MULTI-TIMEFRAME CONFLUENCE*")
+        part1_lines.append("")
+        part1_lines.append(f"1H Score: `{cs.get('timeframe_1h', 'N/A')}/100`")
+        part1_lines.append(f"4H Score: `{cs.get('timeframe_4h', 'N/A')}/100`")
+        part1_lines.append(f"8H Score: `{cs.get('timeframe_8h', 'N/A')}/100`")
+        part1_lines.append(f"Overall: `{cs.get('overall', 'N/A')}/100`")
         if cs.get('analysis'):
-            lines.append(f"_{cs['analysis']}_")
-        lines.append("")
-        lines.append("━━━━━━━━━━━━━━━━━━━━")
-        lines.append("")
+            part1_lines.append(f"_{cs['analysis']}_")
+        part1_lines.append("")
+        part1_lines.append("━━━━━━━━━━━━━━━━━━━━")
+
+    # PART 2: CVD Analysis + OI Delta + Risk/Reward
+    part2_lines = [
+        "📊 *QUANTRA-3 TECHNICAL ANALYSIS*",
+        f"Symbol: `{symbol}`",
+        "",
+        "*Part 2 of 2*",
+        "━━━━━━━━━━━━━━━━━━━━",
+        ""
+    ]
+
+    # CVD Analysis
+    if 'cvd_analysis' in analysis:
+        cvd = analysis['cvd_analysis']
+        part2_lines.append("📈 *CVD TREND ANALYSIS*")
+        part2_lines.append("")
+        part2_lines.append(f"Current Delta: _{cvd.get('current_delta', 'N/A')}_")
+        part2_lines.append(f"1H Trend: _{cvd.get('trend_1h', 'N/A')}_")
+        part2_lines.append(f"4H Trend: _{cvd.get('trend_4h', 'N/A')}_")
+        part2_lines.append(f"24H Trend: _{cvd.get('trend_24h', 'N/A')}_")
+        if cvd.get('divergences'):
+            part2_lines.append(f"Divergences: _{cvd['divergences']}_")
+        part2_lines.append("")
+        part2_lines.append("━━━━━━━━━━━━━━━━━━━━")
+        part2_lines.append("")
+
+    # OI Delta
+    if 'oi_delta' in analysis:
+        oi = analysis['oi_delta']
+        part2_lines.append("📊 *OPEN INTEREST DELTA*")
+        part2_lines.append("")
+        part2_lines.append(f"1H: `{oi.get('delta_1h', 'N/A')}`")
+        part2_lines.append(f"4H: `{oi.get('delta_4h', 'N/A')}`")
+        part2_lines.append(f"24H: `{oi.get('delta_24h', 'N/A')}`")
+        part2_lines.append(f"Correlation: _{oi.get('correlation', 'N/A')}_")
+        part2_lines.append(f"_{oi.get('interpretation', '')}_")
+        part2_lines.append("")
+        part2_lines.append("━━━━━━━━━━━━━━━━━━━━")
+        part2_lines.append("")
 
     # Risk/Reward
     if 'risk_reward' in analysis:
         rr = analysis['risk_reward']
-        lines.append("⚖️ *RISK/REWARD VALIDATION*")
-        lines.append("")
+        part2_lines.append("⚖️ *RISK/REWARD VALIDATION*")
+        part2_lines.append("")
 
         if rr.get('support_levels'):
-            lines.append(f"Support Levels:")
+            part2_lines.append(f"Support Levels:")
             for level in rr['support_levels']:
-                lines.append(f"• `{level}`")
-            lines.append("")
+                part2_lines.append(f"• `{level}`")
+            part2_lines.append("")
 
         if rr.get('resistance_levels'):
-            lines.append(f"Resistance Levels:")
+            part2_lines.append(f"Resistance Levels:")
             for level in rr['resistance_levels']:
-                lines.append(f"• `{level}`")
-            lines.append("")
+                part2_lines.append(f"• `{level}`")
+            part2_lines.append("")
 
         if rr.get('high_probability_zones'):
-            lines.append(f"High Probability: _{rr['high_probability_zones']}_")
-            lines.append("")
+            part2_lines.append(f"High Probability: _{rr['high_probability_zones']}_")
+            part2_lines.append("")
 
         if rr.get('invalidation'):
-            lines.append(f"Invalidation: _{rr['invalidation']}_")
-            lines.append("")
+            part2_lines.append(f"Invalidation: _{rr['invalidation']}_")
+            part2_lines.append("")
 
         if rr.get('position_sizing'):
-            lines.append(f"Position Sizing: _{rr['position_sizing']}_")
+            part2_lines.append(f"Position Sizing: _{rr['position_sizing']}_")
 
-        lines.append("")
-        lines.append("━━━━━━━━━━━━━━━━━━━━")
+        part2_lines.append("")
+        part2_lines.append("━━━━━━━━━━━━━━━━━━━━")
 
-    # Metadata
+    # Add metadata to part 2
     if '_metadata' in analysis:
         meta = analysis['_metadata']
-        lines.append("")
-        lines.append(f"🤖 Model: `{meta.get('model', 'N/A')}`")
+        part2_lines.append("")
+        part2_lines.append(f"🤖 Model: `{meta.get('model', 'N/A')}`")
 
-    return "\n".join(lines)
+    return ["\n".join(part1_lines), "\n".join(part2_lines)]

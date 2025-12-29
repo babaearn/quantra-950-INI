@@ -200,12 +200,158 @@ class BinanceClient:
             print(f"✗ Error fetching orderbook: {e}")
             raise
 
-    def get_market_overview(self, symbol: str = 'BTCUSDT') -> Dict:
+    def get_recent_trades(self, symbol: str = 'BTCUSDT', limit: int = 1000) -> List[Dict]:
+        """
+        Get recent trades for CVD calculation
+
+        Args:
+            symbol: Trading pair symbol
+            limit: Number of recent trades (max 1000)
+
+        Returns:
+            List of recent trades with time, price, qty, isBuyerMaker
+        """
+        try:
+            trades = self.client.futures_recent_trades(symbol=symbol, limit=limit)
+            return trades
+        except BinanceAPIException as e:
+            print(f"✗ Error fetching recent trades: {e}")
+            raise
+
+    def calculate_cvd_trend(self, symbol: str = 'BTCUSDT') -> Dict:
+        """
+        Calculate CVD (Cumulative Volume Delta) trend from recent trades
+
+        Args:
+            symbol: Trading pair symbol
+
+        Returns:
+            Dict with CVD values for 1h, 4h, 24h and trend directions
+        """
+        try:
+            trades = self.get_recent_trades(symbol, limit=1000)
+            now = time.time() * 1000  # Current time in milliseconds
+
+            cvd_1h = 0
+            cvd_4h = 0
+            cvd_24h = 0
+
+            for trade in trades:
+                timestamp = trade['time']
+                volume = float(trade['qty'])
+
+                # If buyer is maker = sell pressure (negative)
+                # If buyer is taker = buy pressure (positive)
+                delta = -volume if trade['isBuyerMaker'] else volume
+
+                # Accumulate based on timeframe
+                if now - timestamp < 3600000:  # 1 hour
+                    cvd_1h += delta
+                if now - timestamp < 14400000:  # 4 hours
+                    cvd_4h += delta
+                cvd_24h += delta  # All trades
+
+            return {
+                '1h': round(cvd_1h, 2),
+                '4h': round(cvd_4h, 2),
+                '24h': round(cvd_24h, 2),
+                'trend_1h': 'rising' if cvd_1h > 0 else 'falling',
+                'trend_4h': 'rising' if cvd_4h > 0 else 'falling',
+                'trend_24h': 'rising' if cvd_24h > 0 else 'falling'
+            }
+        except Exception as e:
+            print(f"✗ Error calculating CVD trend: {e}")
+            return {
+                '1h': 0, '4h': 0, '24h': 0,
+                'trend_1h': 'neutral', 'trend_4h': 'neutral', 'trend_24h': 'neutral'
+            }
+
+    def calculate_orderbook_depth(self, symbol: str = 'BTCUSDT') -> Dict:
+        """
+        Calculate orderbook depth at 1%, 2%, and 5% price levels
+
+        Args:
+            symbol: Trading pair symbol
+
+        Returns:
+            Dict with bid/ask volumes at each price level
+        """
+        try:
+            orderbook = self.client.futures_order_book(symbol=symbol, limit=1000)
+            ticker = self.get_futures_ticker(symbol)
+            current_price = ticker['last_price']
+
+            bids = [[float(price), float(qty)] for price, qty in orderbook['bids']]
+            asks = [[float(price), float(qty)] for price, qty in orderbook['asks']]
+
+            # Calculate price thresholds
+            levels = {
+                '1%': {'bid': current_price * 0.99, 'ask': current_price * 1.01},
+                '2%': {'bid': current_price * 0.98, 'ask': current_price * 1.02},
+                '5%': {'bid': current_price * 0.95, 'ask': current_price * 1.05}
+            }
+
+            depth = {}
+            for level_name, thresholds in levels.items():
+                bid_volume = sum(qty for price, qty in bids if price >= thresholds['bid'])
+                ask_volume = sum(qty for price, qty in asks if price <= thresholds['ask'])
+                imbalance = (bid_volume - ask_volume) / (bid_volume + ask_volume) * 100 if (bid_volume + ask_volume) > 0 else 0
+
+                depth[level_name] = {
+                    'bid_volume': round(bid_volume, 2),
+                    'ask_volume': round(ask_volume, 2),
+                    'imbalance': round(imbalance, 2)
+                }
+
+            return depth
+        except Exception as e:
+            print(f"✗ Error calculating orderbook depth: {e}")
+            return {
+                '1%': {'bid_volume': 0, 'ask_volume': 0, 'imbalance': 0},
+                '2%': {'bid_volume': 0, 'ask_volume': 0, 'imbalance': 0},
+                '5%': {'bid_volume': 0, 'ask_volume': 0, 'imbalance': 0}
+            }
+
+    def calculate_oi_delta(self, symbol: str = 'BTCUSDT') -> Dict:
+        """
+        Calculate Open Interest delta (requires historical storage)
+
+        NOTE: This is a simplified version. For accurate OI delta tracking,
+        you need to store historical OI values in a database and compare them.
+
+        Args:
+            symbol: Trading pair symbol
+
+        Returns:
+            Dict with current OI and a note about historical tracking
+        """
+        try:
+            oi_data = self.get_open_interest(symbol)
+
+            return {
+                'current_oi': oi_data['open_interest'],
+                'note': 'Historical OI delta requires database storage',
+                'delta_1h': 'N/A (requires historical data)',
+                'delta_4h': 'N/A (requires historical data)',
+                'delta_24h': 'N/A (requires historical data)'
+            }
+        except Exception as e:
+            print(f"✗ Error calculating OI delta: {e}")
+            return {
+                'current_oi': 0,
+                'note': 'Error calculating OI',
+                'delta_1h': 'N/A',
+                'delta_4h': 'N/A',
+                'delta_24h': 'N/A'
+            }
+
+    def get_market_overview(self, symbol: str = 'BTCUSDT', include_advanced: bool = False) -> Dict:
         """
         Get comprehensive market overview combining all data sources
 
         Args:
             symbol: Trading pair symbol
+            include_advanced: Include CVD, orderbook depth, OI delta calculations (for /q3)
 
         Returns:
             Dict with complete market data
@@ -251,5 +397,28 @@ class BinanceClient:
         except Exception as e:
             print(f"✗ Orderbook fetch failed: {e}")
             overview['orderbook'] = None
+
+        # Advanced calculations (for /q3 command)
+        if include_advanced:
+            try:
+                overview['cvd_trend'] = self.calculate_cvd_trend(symbol)
+                print(f"✓ CVD trend calculated")
+            except Exception as e:
+                print(f"✗ CVD calculation failed: {e}")
+                overview['cvd_trend'] = None
+
+            try:
+                overview['orderbook_depth'] = self.calculate_orderbook_depth(symbol)
+                print(f"✓ Orderbook depth calculated")
+            except Exception as e:
+                print(f"✗ Orderbook depth calculation failed: {e}")
+                overview['orderbook_depth'] = None
+
+            try:
+                overview['oi_delta'] = self.calculate_oi_delta(symbol)
+                print(f"✓ OI delta calculated")
+            except Exception as e:
+                print(f"✗ OI delta calculation failed: {e}")
+                overview['oi_delta'] = None
 
         return overview
