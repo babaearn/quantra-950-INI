@@ -12,7 +12,9 @@ from bot.formatters import (
     format_analysis_message,
     format_error_message,
     format_welcome_message,
-    format_help_message
+    format_help_message,
+    format_educational_analysis,
+    format_advanced_analysis
 )
 import logging
 
@@ -169,6 +171,154 @@ class QuantraBot:
             )
             logger.error(f"Error processing /q1 for user {user_id}: {e}", exc_info=True)
 
+    async def q2_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """
+        Handle /q2 command - Educational market analysis
+
+        Usage: /q2 BTC or /q2 BTCUSDT
+
+        Args:
+            update: Telegram update object
+            context: Callback context
+        """
+        user_id = update.effective_user.id
+        logger.info(f"User {user_id} requested educational analysis: {' '.join(context.args)}")
+
+        try:
+            # Parse symbol from command
+            if not context.args:
+                await update.message.reply_text(
+                    "❌ Please specify a symbol!\n\n"
+                    "Example: /q2 BTC or /q2 BTCUSDT",
+                    parse_mode=ParseMode.MARKDOWN
+                )
+                return
+
+            symbol = context.args[0].upper()
+
+            # Normalize symbol (add USDT if needed)
+            if not symbol.endswith('USDT'):
+                symbol = f"{symbol}USDT"
+
+            # Send processing message
+            processing_msg = await update.message.reply_text(
+                f"🎓 Generating educational analysis for {symbol}...\n"
+                f"Deep dive into market psychology and smart money insights...",
+                parse_mode=ParseMode.MARKDOWN
+            )
+
+            # Initialize clients if needed
+            self._init_clients()
+
+            # Fetch market data from Binance
+            logger.info(f"Fetching market data for {symbol}")
+            market_data = self.binance_client.get_market_overview(symbol)
+
+            # Analyze with QUANTRA-2 (Educational)
+            logger.info(f"Generating educational analysis for {symbol}")
+            analysis = self.gemini_analyzer.analyze_educational(market_data)
+
+            # Format and send response
+            message = format_educational_analysis(analysis, symbol)
+
+            # Delete processing message
+            await processing_msg.delete()
+
+            # Send analysis
+            await update.message.reply_text(
+                message,
+                parse_mode=ParseMode.MARKDOWN
+            )
+
+            logger.info(f"Successfully sent educational analysis for {symbol} to user {user_id}")
+
+        except ValueError as e:
+            error_msg = format_error_message(str(e), symbol if 'symbol' in locals() else 'UNKNOWN')
+            await update.message.reply_text(error_msg, parse_mode=ParseMode.MARKDOWN)
+            logger.error(f"Validation error for user {user_id}: {e}")
+
+        except Exception as e:
+            error_msg = format_error_message(
+                f"An unexpected error occurred: {str(e)}",
+                symbol if 'symbol' in locals() else 'UNKNOWN'
+            )
+            await update.message.reply_text(error_msg, parse_mode=ParseMode.MARKDOWN)
+            logger.error(f"Error processing /q2 for user {user_id}: {e}", exc_info=True)
+
+    async def q3_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """
+        Handle /q3 command - Advanced technical analysis
+
+        Usage: /q3 BTC or /q3 BTCUSDT
+
+        Args:
+            update: Telegram update object
+            context: Callback context
+        """
+        user_id = update.effective_user.id
+        logger.info(f"User {user_id} requested advanced analysis: {' '.join(context.args)}")
+
+        try:
+            # Parse symbol from command
+            if not context.args:
+                await update.message.reply_text(
+                    "❌ Please specify a symbol!\n\n"
+                    "Example: /q3 BTC or /q3 BTCUSDT",
+                    parse_mode=ParseMode.MARKDOWN
+                )
+                return
+
+            symbol = context.args[0].upper()
+
+            # Normalize symbol (add USDT if needed)
+            if not symbol.endswith('USDT'):
+                symbol = f"{symbol}USDT"
+
+            # Send processing message
+            processing_msg = await update.message.reply_text(
+                f"📊 Generating advanced technical analysis for {symbol}...\n"
+                f"Analyzing orderbook depth, CVD trends, funding history...",
+                parse_mode=ParseMode.MARKDOWN
+            )
+
+            # Initialize clients if needed
+            self._init_clients()
+
+            # Fetch market data from Binance
+            logger.info(f"Fetching market data for {symbol}")
+            market_data = self.binance_client.get_market_overview(symbol)
+
+            # Analyze with QUANTRA-3 (Advanced)
+            logger.info(f"Generating advanced technical analysis for {symbol}")
+            analysis = self.gemini_analyzer.analyze_advanced(market_data)
+
+            # Format and send response
+            message = format_advanced_analysis(analysis, symbol)
+
+            # Delete processing message
+            await processing_msg.delete()
+
+            # Send analysis
+            await update.message.reply_text(
+                message,
+                parse_mode=ParseMode.MARKDOWN
+            )
+
+            logger.info(f"Successfully sent advanced analysis for {symbol} to user {user_id}")
+
+        except ValueError as e:
+            error_msg = format_error_message(str(e), symbol if 'symbol' in locals() else 'UNKNOWN')
+            await update.message.reply_text(error_msg, parse_mode=ParseMode.MARKDOWN)
+            logger.error(f"Validation error for user {user_id}: {e}")
+
+        except Exception as e:
+            error_msg = format_error_message(
+                f"An unexpected error occurred: {str(e)}",
+                symbol if 'symbol' in locals() else 'UNKNOWN'
+            )
+            await update.message.reply_text(error_msg, parse_mode=ParseMode.MARKDOWN)
+            logger.error(f"Error processing /q3 for user {user_id}: {e}", exc_info=True)
+
     def run(self):
         """
         Start the bot and begin polling for messages
@@ -182,9 +332,11 @@ class QuantraBot:
         application.add_handler(CommandHandler("start", self.start_command))
         application.add_handler(CommandHandler("help", self.help_command))
         application.add_handler(CommandHandler("q1", self.q1_command))
+        application.add_handler(CommandHandler("q2", self.q2_command))
+        application.add_handler(CommandHandler("q3", self.q3_command))
 
         logger.info("✓ Bot commands registered")
-        logger.info("Commands: /start, /help, /q1")
+        logger.info("Commands: /start, /help, /q1, /q2, /q3")
 
         # Start polling
         logger.info("🚀 Bot is now running. Press Ctrl+C to stop.")

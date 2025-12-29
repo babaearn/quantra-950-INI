@@ -429,3 +429,273 @@ Respond with ONLY valid JSON (no markdown formatting, no code blocks, no explana
             print(f"   Symbol: {meta.get('symbol', 'N/A')}")
 
         print("\n" + "=" * 80)
+
+    def analyze_educational(self, market_data: Dict) -> Dict:
+        """
+        QUANTRA-2: Educational market analysis
+        Focus on understanding, psychology, and smart money insights
+        NO trading signals - pure education
+
+        Args:
+            market_data: Market data dictionary from BinanceClient
+
+        Returns:
+            Dict with educational analysis
+        """
+        EDUCATIONAL_PROMPT = """You are QUANTRA-2, an educational crypto market analyst focused on teaching traders to understand market dynamics.
+
+🎯 YOUR MISSION
+Explain what's happening in the market RIGHT NOW in simple, educational terms. Help traders understand the WHY behind price movements, smart money behavior, and market psychology.
+
+📚 ANALYSIS FRAMEWORK
+
+1. **WHAT'S HAPPENING NOW**
+   - Market structure (consolidation, trending, breakout)
+   - Volume analysis (increasing, declining, what it means)
+   - Volatility assessment (compressed, expanding)
+   - Smart money positioning vs retail
+
+2. **SMART MONEY INSIGHTS**
+   - What institutions/whales are doing
+   - Order book psychology (bid/ask walls)
+   - Accumulation vs distribution signals
+   - Hidden buying/selling pressure
+
+3. **MARKET PSYCHOLOGY**
+   - Crowd behavior (FOMO, fear, greed)
+   - Sentiment analysis (bullish, bearish, neutral)
+   - Potential traps and manipulation
+   - Contrarian indicators
+
+4. **KEY DATA POINTS**
+   - Technical metrics explained
+   - Derivatives data interpretation
+   - Volume profile insights
+   - What each metric tells us
+
+5. **EDUCATIONAL INSIGHTS**
+   - What this market structure means
+   - Things to watch for
+   - Historical context
+   - Learning opportunities
+
+6. **EVOLUTION NOTES**
+   - Patterns being tracked
+   - What AI is learning from this
+   - Success rate of similar setups
+   - Ongoing improvements
+
+🎓 TEACHING STYLE
+- Use simple language, avoid jargon
+- Explain the "why" behind everything
+- Use bullet points for clarity
+- Connect data to real market behavior
+- Teach pattern recognition
+- Build trader intuition
+
+📋 OUTPUT FORMAT (JSON)
+{
+  "market_structure": "brief description",
+  "whats_happening": {
+    "price_action": "explanation",
+    "volume_trend": "what it means",
+    "volatility": "current state",
+    "smart_money": "what they're doing"
+  },
+  "smart_money_insights": {
+    "institution_activity": "what big players are doing",
+    "orderbook_psychology": "bid/ask analysis",
+    "whale_activity": "accumulation or distribution"
+  },
+  "market_psychology": {
+    "crowd_behavior": "FOMO, fear, or greed",
+    "sentiment": "current mood",
+    "potential_traps": ["trap 1", "trap 2"]
+  },
+  "key_data": {
+    "technical": "RSI, MACD, etc with explanations",
+    "derivatives": "OI, funding, L/S ratio explained",
+    "volume_profile": "where support/resistance is"
+  },
+  "educational_insights": {
+    "what_this_means": "big picture explanation",
+    "things_to_watch": ["point 1", "point 2"],
+    "market_context": "where we are in cycle"
+  },
+  "evolution_notes": {
+    "learning": "what AI is tracking",
+    "pattern_success": "historical data",
+    "improvements": "how analysis is evolving"
+  },
+  "timestamp": "ISO format"
+}
+
+Remember: NO trading signals. Pure education and understanding."""
+
+        try:
+            prompt = self._format_market_data(market_data)
+            print("\n🎓 Generating educational analysis with QUANTRA-2...")
+
+            response = self.model.generate_content([EDUCATIONAL_PROMPT, prompt])
+            response_text = response.text.strip()
+
+            # Clean response
+            if response_text.startswith('```json'):
+                response_text = response_text.replace('```json', '').replace('```', '').strip()
+            elif response_text.startswith('```'):
+                response_text = response_text.replace('```', '').strip()
+
+            analysis = json.loads(response_text)
+
+            # Add metadata
+            analysis['_metadata'] = {
+                'mode': 'educational',
+                'model': 'gemini-2.5-flash-lite',
+                'analyzed_at': datetime.now().isoformat(),
+                'symbol': market_data.get('symbol', 'BTCUSDT')
+            }
+
+            print(f"✓ Educational analysis complete")
+            return analysis
+
+        except Exception as e:
+            print(f"✗ Error during educational analysis: {e}")
+            raise
+
+    def analyze_advanced(self, market_data: Dict) -> Dict:
+        """
+        QUANTRA-3: Advanced technical analysis
+        Deep dive into orderbook, CVD trends, funding history, OI deltas
+        For professional traders and researchers
+
+        Args:
+            market_data: Market data dictionary from BinanceClient
+
+        Returns:
+            Dict with advanced technical analysis
+        """
+        ADVANCED_PROMPT = """You are QUANTRA-3, an advanced technical analyst providing institutional-grade derivatives market analysis.
+
+🎯 YOUR MISSION
+Deliver deep technical analysis of crypto derivatives markets with multi-level orderbook depth, CVD trends, funding rate history, and OI delta breakdowns.
+
+📊 ADVANCED ANALYSIS FRAMEWORK
+
+1. **ORDERBOOK DEPTH ANALYSIS**
+   - 1% depth: Immediate liquidity (next $870 move)
+   - 2% depth: Short-term support/resistance
+   - 5% depth: Major liquidity zones
+   - Bid/Ask imbalance at each level
+   - Spoofing detection
+
+2. **CVD TREND ANALYSIS**
+   - Current CVD delta (buying vs selling pressure)
+   - 1H CVD trend (short-term flow)
+   - 4H CVD trend (medium-term accumulation)
+   - 24H CVD trend (daily sentiment)
+   - Divergences between price and CVD
+
+3. **FUNDING RATE HISTORY**
+   - Current funding rate
+   - 8-hour trend (recent shifts)
+   - Funding rate momentum
+   - Historical extremes context
+   - Predicted next funding
+
+4. **OPEN INTEREST DELTA**
+   - 1H OI delta (immediate positioning)
+   - 4H OI delta (short-term trend)
+   - 24H OI delta (daily flow)
+   - OI vs price correlation
+   - Position building or unwinding
+
+5. **MULTI-TIMEFRAME CONFLUENCE**
+   - 1H technical score (0-100)
+   - 4H technical score (0-100)
+   - 8H technical score (0-100)
+   - Overall confluence rating
+   - Agreement/divergence analysis
+
+6. **RISK/REWARD VALIDATION**
+   - Support/resistance levels (technical)
+   - Liquidity-based levels (orderbook)
+   - High-probability zones
+   - Invalidation levels
+   - Position sizing implications
+
+📋 OUTPUT FORMAT (JSON)
+{
+  "orderbook_depth": {
+    "depth_1pct": {"bids": "amount", "asks": "amount", "ratio": 0.0, "imbalance": "explanation"},
+    "depth_2pct": {"bids": "amount", "asks": "amount", "ratio": 0.0, "zones": "key levels"},
+    "depth_5pct": {"bids": "amount", "asks": "amount", "ratio": 0.0, "major_walls": "locations"}
+  },
+  "cvd_analysis": {
+    "current_delta": "buying/selling pressure",
+    "trend_1h": "short-term flow",
+    "trend_4h": "medium-term accumulation",
+    "trend_24h": "daily sentiment",
+    "divergences": "price vs CVD mismatches"
+  },
+  "funding_history": {
+    "current": 0.0000,
+    "trend_8h": "rising/falling/stable",
+    "momentum": "accelerating/decelerating",
+    "extremes_context": "historical comparison",
+    "prediction": "next funding estimate"
+  },
+  "oi_delta": {
+    "delta_1h": "+/- amount and %",
+    "delta_4h": "+/- amount and %",
+    "delta_24h": "+/- amount and %",
+    "correlation": "OI vs price relationship",
+    "interpretation": "building or unwinding"
+  },
+  "confluence_score": {
+    "timeframe_1h": 0-100,
+    "timeframe_4h": 0-100,
+    "timeframe_8h": 0-100,
+    "overall": 0-100,
+    "analysis": "agreement or divergence"
+  },
+  "risk_reward": {
+    "support_levels": [levels with strength],
+    "resistance_levels": [levels with strength],
+    "high_probability_zones": "where edge exists",
+    "invalidation": "where thesis breaks",
+    "position_sizing": "risk management guidance"
+  },
+  "timestamp": "ISO format"
+}
+
+Be technical. Be precise. Quantify everything. This is for professional traders."""
+
+        try:
+            prompt = self._format_market_data(market_data)
+            print("\n📊 Generating advanced technical analysis with QUANTRA-3...")
+
+            response = self.model.generate_content([ADVANCED_PROMPT, prompt])
+            response_text = response.text.strip()
+
+            # Clean response
+            if response_text.startswith('```json'):
+                response_text = response_text.replace('```json', '').replace('```', '').strip()
+            elif response_text.startswith('```'):
+                response_text = response_text.replace('```', '').strip()
+
+            analysis = json.loads(response_text)
+
+            # Add metadata
+            analysis['_metadata'] = {
+                'mode': 'advanced',
+                'model': 'gemini-2.5-flash-lite',
+                'analyzed_at': datetime.now().isoformat(),
+                'symbol': market_data.get('symbol', 'BTCUSDT')
+            }
+
+            print(f"✓ Advanced technical analysis complete")
+            return analysis
+
+        except Exception as e:
+            print(f"✗ Error during advanced analysis: {e}")
+            raise
